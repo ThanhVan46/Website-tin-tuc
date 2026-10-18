@@ -6,6 +6,7 @@
  *   node download-images.js                          đọc danh sách URL bài trong urls.txt
  *   node download-images.js --category https://dantri.com.vn/xa-hoi.htm --limit 12
  *   node download-images.js --urls my-urls.txt --delay 800
+ *   node download-images.js --topics all --perCategory 10   tải ảnh theo từng chuyên mục menu (khuyên dùng)
  *
  * Kết quả: images/<tên-file> và images/manifest.json  { "dtri-<số cuối URL>": "images/dtri-....jpg" }
  * id khớp với id mà crawler.html sinh ra từ cùng URL, nên index.html / detail.html tự nhận ảnh.
@@ -15,12 +16,12 @@ const fs = require("fs");
 const path = require("path");
 
 /* ---------- Tham số ---------- */
-const opts = { urls: "urls.txt", out: "images", delay: 500, limit: 20 };
+const opts = { urls: "urls.txt", out: "images", delay: 500, limit: 20, perCategory: 10 };
 const argv = process.argv.slice(2);
 for (let i = 0; i < argv.length; i += 2) {
   const key = argv[i].replace(/^--/, "");
-  if (!(key in opts) && key !== "category") { console.error(`Tham số không hợp lệ: ${argv[i]}`); process.exit(1); }
-  opts[key] = ["delay", "limit"].includes(key) ? Number(argv[i + 1]) : argv[i + 1];
+  if (!(key in opts) && !["category", "topics"].includes(key)) { console.error(`Tham số không hợp lệ: ${argv[i]}`); process.exit(1); }
+  opts[key] = ["delay", "limit", "perCategory"].includes(key) ? Number(argv[i + 1]) : argv[i + 1];
 }
 
 const HEADERS = {
@@ -81,8 +82,48 @@ async function collectUrls() {
   return fs.readFileSync(opts.urls, "utf8").split(/\r?\n/).map(s => s.trim()).filter(s => s && !s.startsWith("#"));
 }
 
+
+/* ---------- Chế độ --topics: ảnh theo chuyên mục (id menu → danh sách ảnh) ---------- */
+const TOPICS = {
+  "thoi-su": "/xa-hoi.htm", "phap-luat": "/phap-luat.htm", "the-gioi": "/the-gioi.htm",
+  "kinh-doanh": "/kinh-doanh.htm", "giao-duc": "/giao-duc.htm", "the-thao": "/the-thao.htm",
+  "cong-nghe": "/suc-manh-so.htm", "suc-khoe": "/suc-khoe.htm"
+};
+
+async function runTopics() {
+  fs.mkdirSync(opts.out, { recursive: true });
+  const manifestPath = path.join(opts.out, "manifest.json");
+  const manifest = fs.existsSync(manifestPath) ? JSON.parse(fs.readFileSync(manifestPath, "utf8")) : {};
+  const seen = new Set();
+  for (const [topic, p] of Object.entries(TOPICS)) {
+    const pageUrl = "https://dantri.com.vn" + p;
+    console.log(`\n== ${topic}  (${pageUrl})`);
+    const files = [];
+    try {
+      const html = await (await get(pageUrl)).text();
+      const links = [...new Set([...html.matchAll(/href=["']([^"']*?-\d{14,17}\.htm)["']/g)].map(m => new URL(m[1], pageUrl).href))];
+      for (const link of links) {
+        if (files.length >= opts.perCategory) break;
+        try {
+          const imgUrl = extractImage(await (await get(link)).text(), link);
+          if (!imgUrl || seen.has(imgUrl)) continue;
+          const res = await get(imgUrl);
+          const file = path.join(opts.out, `${topic}-${files.length + 1}.${extFrom(res.headers.get("content-type"), imgUrl)}`);
+          fs.writeFileSync(file, Buffer.from(await res.arrayBuffer()));
+          seen.add(imgUrl); files.push(file.split(path.sep).join("/"));
+          console.log(`  OK ${file}`);
+        } catch (err) { console.log(`  LỖI ${link} → ${err.message}`); }
+        await sleep(opts.delay);
+      }
+    } catch (err) { console.log(`  LỖI chuyên mục → ${err.message}`); }
+    if (files.length) { manifest["cat:" + topic] = files; fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2)); }
+  }
+  console.log(`\nXong. Manifest: ${manifestPath}`);
+}
+
 /* ---------- Chạy chính ---------- */
 (async () => {
+  if (opts.topics) return runTopics();
   const urls = await collectUrls();
   fs.mkdirSync(opts.out, { recursive: true });
   const manifestPath = path.join(opts.out, "manifest.json");

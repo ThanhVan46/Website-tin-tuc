@@ -122,9 +122,15 @@
     return { added: true };
   }
 
+  /** Link ảnh gốc của bài (nếu bài có trường image); không có → "" để giao diện dùng ảnh chuyên mục. */
+  function getImage(id) {
+    const p = init().posts.find(x => x.id === id);
+    return (p && p.image) || "";
+  }
+
   function resetData() { localStorage.removeItem(STORAGE_KEY); return init(); }
 
   init(); // tự chạy khi file được nạp
 
-  global.DataStore = { STORAGE_KEY, SOURCE, slugify, init, getPosts, addPost, resetData };
+  global.DataStore = { STORAGE_KEY, SOURCE, slugify, init, getPosts, addPost, getImage, resetData };
 })(window);

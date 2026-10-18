@@ -182,7 +182,19 @@
     const loadImageMap = () => fetch("images/manifest.json").then(r => r.ok ? r.json() : {}).catch(() => ({}));
 
     /** Thứ tự ưu tiên: ảnh trong repo → link ảnh đã crawl → ảnh SVG minh họa. */
-    function thumb(post) { return IMG_MAP[post.id] || DataStore.getImage(post.id) || placeholder(post); }
+    function thumb(post) {
+      return IMG_MAP[post.id] || topicImage(post) || DataStore.getImage(post.id) || placeholder(post);
+    }
+
+    /** Ảnh theo chuyên mục (images/manifest.json: "cat:<id menu>": [ảnh...]) — mỗi bài một ảnh ổn định theo id. */
+    function topicImage(post) {
+      let h = 0; for (const ch of post.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+      for (const c of post.category) {
+        const list = IMG_MAP["cat:" + DataStore.slugify(c)];
+        if (Array.isArray(list) && list.length) return list[h % list.length];
+      }
+      return "";
+    }
 
     /** Ảnh lỗi → thử bước tiếp theo trong chuỗi ưu tiên. */
     document.addEventListener("error", e => {
@@ -191,7 +203,7 @@
       const post = DataStore.getPosts().find(p => p.id === img.dataset.id);
       if (!post) return;
       const remote = DataStore.getImage(post.id), step = Number(img.dataset.fb || 0);
-      if (step === 0 && remote && IMG_MAP[post.id]) { img.dataset.fb = 1; img.src = remote; }
+      if (step === 0 && remote && thumb(post) !== remote) { img.dataset.fb = 1; img.src = remote; }
       else if (step < 2 && !img.src.startsWith("data:")) { img.dataset.fb = 2; img.src = placeholder(post); }
     }, true);
 

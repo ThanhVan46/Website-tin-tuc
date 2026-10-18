@@ -154,7 +154,7 @@
     }
 
     /** Ảnh minh họa SVG ổn định theo id (dữ liệu bài viết không có trường ảnh). */
-    function thumb(post) {
+    function placeholder(post) {
       let h = 0; for (const ch of post.id) h = (h * 31 + ch.charCodeAt(0)) % 360;
       const label = esc((post.category[0] || "Tin").slice(0, 18));
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
@@ -162,6 +162,24 @@
         `<rect width="640" height="360" fill="url(#g)"/><text x="320" y="190" fill="#fff" fill-opacity=".85" font-family="Georgia,serif" font-size="44" text-anchor="middle">${label}</text></svg>`;
       return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
     }
+
+    /** Ảnh tải bằng Terminal: images/manifest.json { id: "images/<file>" } (rỗng nếu chưa có). */
+    let IMG_MAP = {};
+    const loadImageMap = () => fetch("images/manifest.json").then(r => r.ok ? r.json() : {}).catch(() => ({}));
+
+    /** Thứ tự ưu tiên: ảnh trong repo → link ảnh đã crawl → ảnh SVG minh họa. */
+    function thumb(post) { return IMG_MAP[post.id] || DataStore.getImage(post.id) || placeholder(post); }
+
+    /** Ảnh lỗi → thử bước tiếp theo trong chuỗi ưu tiên. */
+    document.addEventListener("error", e => {
+      const img = e.target;
+      if (img.tagName !== "IMG" || !img.dataset.id) return;
+      const post = DataStore.getPosts().find(p => p.id === img.dataset.id);
+      if (!post) return;
+      const remote = DataStore.getImage(post.id), step = Number(img.dataset.fb || 0);
+      if (step === 0 && remote && IMG_MAP[post.id]) { img.dataset.fb = 1; img.src = remote; }
+      else if (step < 2 && !img.src.startsWith("data:")) { img.dataset.fb = 2; img.src = placeholder(post); }
+    }, true);
 
     /* Menu + footer */
     function renderNav() {
@@ -211,7 +229,7 @@
 
       const relHTML = related.length
         ? related.map(p => `<a class="rel" href="detail.html?id=${encodeURIComponent(p.id)}">
-            <div class="ratio"><img loading="lazy" src="${thumb(p)}" alt=""></div>
+            <div class="ratio"><img loading="lazy" referrerpolicy="no-referrer" data-id="${esc(p.id)}" src="${thumb(p)}" alt=""></div>
             <div><h3>${esc(p.title)}</h3><div class="meta">${formatDate(p.publishedAt)}</div></div></a>`).join("")
         : `<p class="meta">Chưa có bài liên quan.</p>`;
 
@@ -221,7 +239,7 @@
           <h1>${esc(post.title)}</h1>
           <div class="byline"><span>Tác giả: <strong>${esc(post.author)}</strong></span><span>${formatDate(post.publishedAt)}</span><span>Nguồn: ${esc(post.source)}</span></div>
           <p class="sapo">${esc(post.excerpt)}</p>
-          <div class="hero"><img src="${thumb(post)}" alt="${esc(post.title)}"></div>
+          <div class="hero"><img referrerpolicy="no-referrer" data-id="${esc(post.id)}" src="${thumb(post)}" alt="${esc(post.title)}"></div>
           <div class="body">${paragraphs}</div>
           <p class="source">Bài viết gốc: <a href="${esc(post.url)}" target="_blank" rel="noopener noreferrer">${esc(post.url)}</a></p>
         </article>
@@ -238,7 +256,7 @@
 
     const id = new URLSearchParams(location.search).get("id");
     const post = id && DataStore.getPosts().find(p => p.id === id);
-    post ? renderPost(post) : renderNotFound();
+    loadImageMap().then(m => { IMG_MAP = m; post ? renderPost(post) : renderNotFound(); });
   </script>
 </body>
 </html>

@@ -1,0 +1,16 @@
+# File hệ thống
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Thư viện npm (dự án này không dùng, đề phòng lỡ cài)
+node_modules/
+package-lock.json
+
+# Cấu hình editor
+.vscode/
+.idea/
+
+# Log và file tạm
+*.log
+*.tmp

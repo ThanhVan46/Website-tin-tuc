@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chi tiết bài viết – Tin tức 24h</title>
+  <style>
+    :root { --green: #0d6b3f; --green-dark: #08502d; --ink: #1c2420; --muted: #5c6862;
+      --line: #d9dfda; --paper: #f7f8f5; --white: #fff; --max: 1160px; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink);
+      font: 16px/1.6 "Segoe UI", system-ui, -apple-system, Arial, sans-serif; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    ul { list-style: none; margin: 0; padding: 0; }
+    :focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+    .container { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+
+    /* Header + navbar (giống index.html) */
+    .site-header { background: var(--white); border-bottom: 3px solid var(--green); position: sticky; top: 0; z-index: 50; }
+    .header-bar { display: flex; align-items: center; justify-content: space-between; min-height: 60px; }
+    .logo { font: 700 1.6rem Georgia, "Times New Roman", serif; color: var(--green); }
+    .nav-toggle { display: none; background: none; border: 1px solid var(--line); border-radius: 4px;
+      padding: 8px 12px; font: inherit; font-weight: 600; cursor: pointer; color: var(--ink); }
+    .nav-menu { display: flex; flex-wrap: wrap; }
+    .nav-item { position: relative; }
+    .nav-item > a { display: block; padding: 18px 14px; font-weight: 600; }
+    .nav-item > a:hover, .nav-item > a.active { color: var(--green); box-shadow: inset 0 -3px 0 var(--green); }
+    .has-children > a::after { content: "▾"; margin-left: 5px; font-size: .75em; }
+    .sub-menu { display: none; position: absolute; left: 0; top: 100%; min-width: 190px; background: var(--white);
+      border: 1px solid var(--line); border-top: 3px solid var(--green); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+    .sub-menu a { display: block; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+    .sub-menu li:last-child a { border-bottom: 0; }
+    .sub-menu a:hover { background: #e8f3ec; color: var(--green); }
+    .has-children:hover > .sub-menu, .has-children:focus-within > .sub-menu { display: block; }
+
+    /* Nội dung bài viết */
+    main { padding: 28px 0 48px; min-height: 60vh; }
+    .layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 40px; }
+    .crumbs { font-size: .9rem; color: var(--muted); margin-bottom: 14px; }
+    .crumbs a { color: var(--green); font-weight: 600; }
+    .crumbs a:hover { text-decoration: underline; }
+    .crumbs span { margin: 0 6px; }
+    .article h1 { font: 700 2.2rem/1.25 Georgia, "Times New Roman", serif; margin: 0 0 12px; }
+    .byline { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: .92rem;
+      padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+    .byline strong { color: var(--ink); }
+    .sapo { font-size: 1.15rem; font-weight: 600; line-height: 1.55; margin: 0 0 20px; }
+    .hero { aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; margin-bottom: 22px; }
+    .hero img { width: 100%; height: 100%; object-fit: cover; }
+    .body p { font-size: 1.08rem; line-height: 1.8; margin: 0 0 1.1em; }
+    .source { margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: .92rem; }
+    .source a { color: var(--green); font-weight: 600; word-break: break-all; }
+    .source a:hover { text-decoration: underline; }
+
+    /* Bài liên quan */
+    .side h2 { font: 700 1.2rem Georgia, serif; margin: 0 0 14px; padding-left: 10px; border-left: 5px solid var(--green); }
+    .rel { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .rel .ratio { flex: 0 0 110px; aspect-ratio: 16 / 10; border-radius: 4px; overflow: hidden; align-self: flex-start; }
+    .rel img { width: 100%; height: 100%; object-fit: cover; }
+    .rel h3 { font: 700 .98rem/1.35 Georgia, serif; margin: 0 0 3px; }
+    .rel a:hover h3 { color: var(--green); }
+    .rel .meta { font-size: .8rem; color: var(--muted); }
+    .not-found { text-align: center; padding: 70px 0; }
+    .not-found h1 { font: 700 1.8rem Georgia, serif; }
+    .btn { display: inline-block; padding: 10px 24px; background: var(--green); color: #fff; border-radius: 4px; font-weight: 600; }
+    .btn:hover { background: var(--green-dark); }
+
+    /* Footer */
+    .site-footer { background: #10231a; color: #cfe0d6; padding: 40px 0 0; }
+    .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.4fr; gap: 32px; padding-bottom: 32px; }
+    .site-footer h4 { color: #fff; font: 700 1.05rem Georgia, serif; margin: 0 0 12px; }
+    .site-footer p { margin: 0 0 8px; font-size: .95rem; }
+    .site-footer li { margin-bottom: 6px; font-size: .95rem; }
+    .site-footer a:hover { color: #fff; text-decoration: underline; }
+    .social { display: flex; gap: 10px; margin-top: 14px; }
+    .social a { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: #1d3a2b; }
+    .social a:hover { background: var(--green); text-decoration: none; }
+    .social svg { width: 20px; height: 20px; fill: #fff; }
+    .copyright { border-top: 1px solid #2a4538; padding: 16px 0; text-align: center; font-size: .88rem; color: #9fb7a9; }
+
+    @media (max-width: 900px) {
+      .nav-toggle { display: block; }
+      .nav-menu { display: none; flex-direction: column; width: 100%; padding-bottom: 8px; }
+      .nav-menu.open { display: flex; }
+      .header-bar { flex-wrap: wrap; padding: 8px 0; }
+      .nav-item > a { padding: 12px 4px; border-top: 1px solid var(--line); }
+      .nav-item > a:hover { box-shadow: none; }
+      .has-children > a::after { content: none; }
+      .sub-menu { display: block; position: static; border: 0; box-shadow: none; padding-left: 16px; min-width: 0; }
+      .sub-menu a { border-bottom: 0; padding: 8px 4px; color: var(--muted); }
+      .layout { grid-template-columns: 1fr; gap: 28px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .article h1 { font-size: 1.6rem; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-bar">
+      <a class="logo" href="index.html#/">Tin tức 24h</a>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">☰ Menu</button>
+      <nav aria-label="Chuyên mục"><ul class="nav-menu" id="navMenu"></ul></nav>
+    </div>
+  </header>
+
+  <main class="container" id="app"></main>
+
+  <footer class="site-footer" id="lien-he">
+    <div class="container footer-grid">
+      <section>
+        <h4>Tin tức 24h</h4>
+        <p>Trang tin điện tử phục vụ bài tập lớn môn Xây dựng ứng dụng Web – Đại học Phenikaa. Nội dung tổng hợp từ dantri.com.vn.</p>
+        <div class="social" aria-label="Mạng xã hội">
+          <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></a>
+          <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3z"/></svg></a>
+          <a href="https://tiktok.com" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M16.6 2h-3.2v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V8.6a5.8 5.8 0 1 0 5 5.8V8.3a7.2 7.2 0 0 0 4.2 1.3V6.4A4.2 4.2 0 0 1 16.6 2z"/></svg></a>
+        </div>
+      </section>
+      <section>
+        <h4>Liên kết nhanh</h4>
+        <ul>
+          <li><a href="index.html#/">Trang chủ</a></li>
+          <li><a href="index.html#/tin-moi">Tin mới</a></li>
+          <li><a href="#lien-he">Liên hệ</a></li>
+        </ul>
+      </section>
+      <section><h4>Chuyên mục</h4><ul id="footerCats"></ul></section>
+      <section>
+        <h4>Liên hệ</h4>
+        <p>Email: <a href="mailto:lienhe@tintuc24h.example">lienhe@tintuc24h.example</a></p>
+        <p>Địa chỉ: Đại học Phenikaa, Yên Nghĩa, Hà Đông, Hà Nội</p>
+      </section>
+    </div>
+    <div class="copyright">© <span id="year"></span> Tin tức 24h. Sản phẩm học tập, nội dung thuộc về dantri.com.vn.</div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+    "use strict";
+
+    const data = DataStore.init();
+    const MENU = data.menu;
+    const $ = id => document.getElementById(id);
+    const norm = s => DataStore.slugify(s);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    function formatDate(s) {
+      const m = s.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})/);
+      return m ? `${m[4]} ${m[3]}/${m[2]}/${m[1]}` : s;
+    }
+
+    /** Ảnh minh họa SVG ổn định theo id (dữ liệu bài viết không có trường ảnh). */
+    function thumb(post) {
+      let h = 0; for (const ch of post.id) h = (h * 31 + ch.charCodeAt(0)) % 360;
+      const label = esc((post.category[0] || "Tin").slice(0, 18));
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
+        `<stop offset="0" stop-color="hsl(${h},45%,38%)"/><stop offset="1" stop-color="hsl(${(h + 40) % 360},50%,24%)"/></linearGradient></defs>` +
+        `<rect width="640" height="360" fill="url(#g)"/><text x="320" y="190" fill="#fff" fill-opacity=".85" font-family="Georgia,serif" font-size="44" text-anchor="middle">${label}</text></svg>`;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+    /* Menu + footer */
+    function renderNav() {
+      const link = n => `<a href="index.html#/c/${esc(n.id)}">${esc(n.title)}</a>`;
+      $("navMenu").innerHTML =
+        `<li class="nav-item"><a href="index.html#/">Trang chủ</a></li>` +
+        MENU.map(n => {
+          const kids = n.children && n.children.length;
+          return `<li class="nav-item${kids ? " has-children" : ""}">${link(n)}` +
+            (kids ? `<ul class="sub-menu">${n.children.map(c => `<li>${link(c)}</li>`).join("")}</ul>` : "") + `</li>`;
+        }).join("");
+      $("footerCats").innerHTML = MENU.map(n => `<li>${link(n)}</li>`).join("");
+    }
+
+    /** Tìm node menu theo tên chuyên mục để tạo breadcrumb có link. */
+    function findByTitle(title, list = MENU) {
+      for (const n of list) {
+        if (norm(n.title) === norm(title)) return n;
+        const f = n.children && findByTitle(title, n.children);
+        if (f) return f;
+      }
+      return null;
+    }
+
+    function renderNotFound() {
+      document.title = "Không tìm thấy bài viết – Tin tức 24h";
+      $("app").innerHTML = `<div class="not-found"><h1>Không tìm thấy bài viết</h1>
+        <p>Bài viết không tồn tại hoặc dữ liệu LocalStorage đã bị xóa.</p><a class="btn" href="index.html#/">Về trang chủ</a></div>`;
+    }
+
+    function renderPost(post) {
+      document.title = `${post.title} – Tin tức 24h`;
+
+      const crumbs = [`<a href="index.html#/">Trang chủ</a>`].concat(post.category.map(c => {
+        const node = findByTitle(c);
+        return node ? `<a href="index.html#/c/${esc(node.id)}">${esc(c)}</a>` : esc(c);
+      })).join("<span>›</span>");
+
+      const paragraphs = post.content.split("\n").map(s => s.trim()).filter(Boolean)
+        .map(p => `<p>${esc(p)}</p>`).join("");
+
+      // Bài liên quan: cùng chuyên mục, mới nhất trước, tối đa 5, bỏ bài đang đọc
+      const names = new Set(post.category.map(norm));
+      const related = DataStore.getPosts()
+        .filter(p => p.id !== post.id && p.category.some(c => names.has(norm(c))))
+        .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 5);
+
+      const relHTML = related.length
+        ? related.map(p => `<a class="rel" href="detail.html?id=${encodeURIComponent(p.id)}">
+            <div class="ratio"><img loading="lazy" src="${thumb(p)}" alt=""></div>
+            <div><h3>${esc(p.title)}</h3><div class="meta">${formatDate(p.publishedAt)}</div></div></a>`).join("")
+        : `<p class="meta">Chưa có bài liên quan.</p>`;
+
+      $("app").innerHTML = `<div class="layout">
+        <article class="article">
+          <nav class="crumbs" aria-label="Breadcrumb">${crumbs}</nav>
+          <h1>${esc(post.title)}</h1>
+          <div class="byline"><span>Tác giả: <strong>${esc(post.author)}</strong></span><span>${formatDate(post.publishedAt)}</span><span>Nguồn: ${esc(post.source)}</span></div>
+          <p class="sapo">${esc(post.excerpt)}</p>
+          <div class="hero"><img src="${thumb(post)}" alt="${esc(post.title)}"></div>
+          <div class="body">${paragraphs}</div>
+          <p class="source">Bài viết gốc: <a href="${esc(post.url)}" target="_blank" rel="noopener noreferrer">${esc(post.url)}</a></p>
+        </article>
+        <aside class="side"><h2>Bài viết liên quan</h2>${relHTML}</aside></div>`;
+    }
+
+    /* Khởi động */
+    $("navToggle").addEventListener("click", () => {
+      const open = $("navMenu").classList.toggle("open");
+      $("navToggle").setAttribute("aria-expanded", String(open));
+    });
+    $("year").textContent = new Date().getFullYear();
+    renderNav();
+
+    const id = new URLSearchParams(location.search).get("id");
+    const post = id && DataStore.getPosts().find(p => p.id === id);
+    post ? renderPost(post) : renderNotFound();
+  </script>
+</body>
+</html>

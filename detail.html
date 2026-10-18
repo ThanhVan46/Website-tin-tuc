@@ -248,9 +248,9 @@
             <div><h3>${esc(p.title)}</h3><div class="meta">${formatDate(p.publishedAt)}</div></div></a>`).join("")
         : `<p class="meta">Chưa có bài liên quan.</p>`;
 
-      $("app").innerHTML = `<div class="layout">
+      $("app").innerHTML = `<nav class="crumbs" aria-label="Breadcrumb">${crumbs}</nav>
+      <div class="layout">
         <article class="article">
-          <nav class="crumbs" aria-label="Breadcrumb">${crumbs}</nav>
           <h1>${esc(post.title)}</h1>
           <div class="byline"><span>Tác giả: <strong>${esc(post.author)}</strong></span><span>${formatDate(post.publishedAt)}</span></div>
           <p class="sapo">${esc(post.excerpt)}</p>

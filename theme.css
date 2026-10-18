@@ -12,3 +12,8 @@
 .side h2{margin-bottom:8px}
 .rel:last-child{border-bottom:0}
 @media(max-width:900px){.layout>.article,.layout>.side{padding:18px}.body p{text-align:left}}
+
+/* Breadcrumb nằm riêng phía trên khung bài viết, cách thanh menu một khoảng */
+main{padding-top:36px}
+.crumbs{margin:0 0 18px;font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.01em}
+.crumbs span{color:var(--muted);font-weight:400}

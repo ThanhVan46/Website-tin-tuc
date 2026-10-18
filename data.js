@@ -14,7 +14,7 @@
   "use strict";
 
   const STORAGE_KEY = "dantri_data";
-  const DATA_VERSION = 2;            // tăng số này khi đổi cấu trúc/dữ liệu mẫu → tự nạp lại
+  const DATA_VERSION = 3;            // tăng số này khi đổi cấu trúc/dữ liệu mẫu → tự nạp lại
   const SOURCE = "dantri.com.vn";
 
   /* ---------- 1. MENU PHÂN CẤP ---------- */
@@ -364,14 +364,14 @@
 
   function buildPost(node, parent, c, head, i, k) {
     const d = new Date(2026, 9, 19, 18, 0);
-    d.setMinutes(d.getMinutes() - (i * 310 + k * 11));
+    d.setMinutes(d.getMinutes() - (i * 420 + k * 23));   // bài thứ i của MỌI mục xen kẽ nhau → trang chủ đa dạng chuyên mục
     const rot = c.paras.slice(i % c.paras.length).concat(c.paras.slice(0, i % c.paras.length));
     return {
       id: `mau-${node.id}-${i + 1}`,                       // DUY NHẤT cho mỗi bài
       title: head,
       slug: slugify(head),
-      excerpt: `${head}: diễn biến mới nhất, ý kiến chuyên gia và những điều bạn đọc cần lưu ý trong chuyên mục ${node.title}.`,
-      content: [OPENERS[i % OPENERS.length](head), ...rot, ...CLOSERS].join("\n"),
+      excerpt: rot[0],                                                  // sapo: đoạn riêng của mục, không lặp tiêu đề
+      content: [OPENERS[i % OPENERS.length](head), ...rot.slice(1), ...CLOSERS].join("\n"),
       author: AUTHORS[(i + k) % AUTHORS.length],
       category: parent ? [parent.title, node.title] : [node.title],
       publishedAt: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`,
@@ -403,7 +403,7 @@
     if (data && data.version === DATA_VERSION && Array.isArray(data.menu) && Array.isArray(data.posts)) return data;
 
     const old = data && Array.isArray(data.posts) ? data.posts : [];
-    const crawled = old.filter(p => p && p.content && !String(p.content).includes("Đây là đoạn mở đầu của bài viết"));
+    const crawled = old.filter(p => p && p.content && !String(p.id).startsWith("mau-") && !String(p.content).includes("Đây là đoạn mở đầu của bài viết"));
     const fresh = { version: DATA_VERSION, menu: MENU, posts: [...crawled, ...buildSamplePosts()] };
     save(fresh);
     return fresh;

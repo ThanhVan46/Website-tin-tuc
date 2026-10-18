@@ -14,8 +14,8 @@
   "use strict";
 
   const STORAGE_KEY = "dantri_data";
-  const DATA_VERSION = 3;            // tăng số này khi đổi cấu trúc/dữ liệu mẫu → tự nạp lại
-  const SOURCE = "dantri.com.vn";
+  const DATA_VERSION = 4;            // tăng số này khi đổi cấu trúc/dữ liệu mẫu → tự nạp lại
+  const SOURCE = "Tin tức 24h";
 
   /* ---------- 1. MENU PHÂN CẤP ---------- */
   const MENU = [
@@ -362,6 +362,16 @@
     "Chúng tôi sẽ tiếp tục cập nhật thông tin về vấn đề này khi có diễn biến mới. Mời bạn đọc theo dõi và chia sẻ ý kiến của mình."
   ];
 
+  const EXTRA = [
+    (h, m) => `Theo phản ánh, nội dung liên quan đến “${h}” không chỉ ảnh hưởng đến một nhóm nhỏ mà còn tác động đến nhiều đối tượng trong lĩnh vực ${m}. Vì vậy, việc cập nhật thông tin đầy đủ và chính xác là điều cần thiết.`,
+    (h, m) => `Từ thực tế triển khai, các đơn vị trong lĩnh vực ${m} cho rằng cần có lộ trình cụ thể, phân công trách nhiệm rõ ràng và cơ chế theo dõi kết quả để mỗi bước đi đều mang lại hiệu quả đo đếm được.`,
+    (h, m) => `Một số ý kiến cho rằng vấn đề nêu trong “${h}” cần được nhìn nhận ở nhiều góc độ, cân nhắc cả lợi ích trước mắt lẫn tác động lâu dài đối với cộng đồng.`,
+    (h, m) => `Bạn đọc quan tâm đến lĩnh vực ${m} có thể tiếp tục theo dõi chuyên mục để cập nhật những diễn biến mới cùng các phân tích chuyên sâu trong thời gian tới.`,
+    (h, m) => `Các ý kiến tại buổi trao đổi đều thống nhất rằng sự phối hợp giữa các bên liên quan là yếu tố then chốt để những giải pháp đề ra đi vào thực tiễn.`,
+    (h, m) => `Để hiểu rõ hơn, cần xem xét bối cảnh chung của lĩnh vực ${m} trong thời gian qua, từ đó đánh giá đúng mức độ quan trọng của vấn đề.`
+  ];
+  const SUBS = [["Ý kiến từ thực tế", "Góc nhìn của chuyên gia", "Hướng đi sắp tới"], ["Bối cảnh vấn đề", "Những điều cần lưu ý", "Bước tiếp theo"], ["Diễn biến đáng chú ý", "Đánh giá từ giới chuyên môn", "Kỳ vọng thời gian tới"]];
+
   function buildPost(node, parent, c, head, i, k) {
     const d = new Date(2026, 9, 19, 18, 0);
     d.setMinutes(d.getMinutes() - (i * 420 + k * 23));   // bài thứ i của MỌI mục xen kẽ nhau → trang chủ đa dạng chuyên mục
@@ -371,7 +381,12 @@
       title: head,
       slug: slugify(head),
       excerpt: rot[0],                                                  // sapo: đoạn riêng của mục, không lặp tiêu đề
-      content: [OPENERS[i % OPENERS.length](head), ...rot.slice(1), ...CLOSERS].join("\n"),
+      content: (() => {
+        const m = node.title.toLowerCase(), sb = SUBS[i % SUBS.length], e = n => EXTRA[(i + n) % EXTRA.length](head, m);
+        const o = c.paras.filter(x => x !== rot[0]);
+        return [OPENERS[i % OPENERS.length](head), o[0], e(0), "## " + sb[0], o[1], e(2),
+          "## " + sb[1], o[2], e(4), "## " + sb[2], o[3], e(1), ...CLOSERS].join("\n");
+      })(),
       author: AUTHORS[(i + k) % AUTHORS.length],
       category: parent ? [parent.title, node.title] : [node.title],
       publishedAt: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`,

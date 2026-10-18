@@ -97,6 +97,8 @@
       .footer-grid { grid-template-columns: 1fr; }
     }
   </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css?v=4">
 </head>
 <body>
   <header class="site-header">
@@ -113,7 +115,7 @@
     <div class="container footer-grid">
       <section>
         <h4>Tin tức 24h</h4>
-        <p>Trang tin điện tử phục vụ bài tập lớn môn Xây dựng ứng dụng Web – Đại học Phenikaa. Nội dung tổng hợp từ dantri.com.vn.</p>
+        <p>Trang tin điện tử phục vụ bài tập lớn môn Xây dựng ứng dụng Web – Đại học Phenikaa. Các bài viết trên trang là nội dung mẫu phục vụ học tập.</p>
         <div class="social" aria-label="Mạng xã hội">
           <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></a>
           <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3z"/></svg></a>
@@ -135,10 +137,10 @@
         <p>Địa chỉ: Đại học Phenikaa, Yên Nghĩa, Hà Đông, Hà Nội</p>
       </section>
     </div>
-    <div class="copyright">© <span id="year"></span> Tin tức 24h. Sản phẩm học tập, nội dung thuộc về dantri.com.vn.</div>
+    <div class="copyright">© <span id="year"></span> Tin tức 24h. Sản phẩm học tập, nội dung mang tính minh họa.</div>
   </footer>
 
-  <script src="data.js?v=3"></script>
+  <script src="data.js?v=4"></script>
   <script>
     "use strict";
 
@@ -231,7 +233,7 @@
       })).join("<span>›</span>");
 
       const paragraphs = post.content.split("\n").map(s => s.trim()).filter(Boolean)
-        .map(p => `<p>${esc(p)}</p>`).join("");
+        .map(p => p.startsWith("## ") ? `<h2>${esc(p.slice(3))}</h2>` : `<p>${esc(p)}</p>`).join("");
 
       // Bài liên quan: cùng chuyên mục, mới nhất trước, tối đa 5, bỏ bài đang đọc
       const names = new Set(post.category.map(norm));
@@ -251,7 +253,7 @@
         <article class="article">
           <nav class="crumbs" aria-label="Breadcrumb">${crumbs}</nav>
           <h1>${esc(post.title)}</h1>
-          <div class="byline"><span>Tác giả: <strong>${esc(post.author)}</strong></span><span>${formatDate(post.publishedAt)}</span><span>Nguồn: ${esc(post.source)}</span></div>
+          <div class="byline"><span>Tác giả: <strong>${esc(post.author)}</strong></span><span>${formatDate(post.publishedAt)}</span></div>
           <p class="sapo">${esc(post.excerpt)}</p>
           <div class="hero"><img referrerpolicy="no-referrer" data-id="${esc(post.id)}" src="${thumb(post)}" alt="${esc(post.title)}"></div>
           <div class="body">${paragraphs}</div>

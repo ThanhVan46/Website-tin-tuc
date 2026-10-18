@@ -1,0 +1,98 @@
+{
+  "cat:thoi-su": [
+    "images/thoi-su-1.jpg",
+    "images/thoi-su-2.jpg",
+    "images/thoi-su-3.jpg",
+    "images/thoi-su-4.jpg",
+    "images/thoi-su-5.jpg",
+    "images/thoi-su-6.jpg",
+    "images/thoi-su-7.jpg",
+    "images/thoi-su-8.jpg",
+    "images/thoi-su-9.jpg",
+    "images/thoi-su-10.jpg"
+  ],
+  "cat:phap-luat": [
+    "images/phap-luat-1.jpg",
+    "images/phap-luat-2.jpg",
+    "images/phap-luat-3.jpg",
+    "images/phap-luat-4.jpg",
+    "images/phap-luat-5.jpg",
+    "images/phap-luat-6.jpg",
+    "images/phap-luat-7.jpg",
+    "images/phap-luat-8.jpg",
+    "images/phap-luat-9.jpg",
+    "images/phap-luat-10.jpg"
+  ],
+  "cat:the-gioi": [
+    "images/the-gioi-1.jpg",
+    "images/the-gioi-2.jpg",
+    "images/the-gioi-3.jpg",
+    "images/the-gioi-4.jpg",
+    "images/the-gioi-5.jpg",
+    "images/the-gioi-6.jpg",
+    "images/the-gioi-7.jpg",
+    "images/the-gioi-8.jpg",
+    "images/the-gioi-9.jpg",
+    "images/the-gioi-10.jpg"
+  ],
+  "cat:kinh-doanh": [
+    "images/kinh-doanh-1.jpg",
+    "images/kinh-doanh-2.jpg",
+    "images/kinh-doanh-3.jpg",
+    "images/kinh-doanh-4.jpg",
+    "images/kinh-doanh-5.jpg",
+    "images/kinh-doanh-6.jpg",
+    "images/kinh-doanh-7.jpg",
+    "images/kinh-doanh-8.jpg",
+    "images/kinh-doanh-9.jpg",
+    "images/kinh-doanh-10.jpg"
+  ],
+  "cat:giao-duc": [
+    "images/giao-duc-1.jpg",
+    "images/giao-duc-2.jpg",
+    "images/giao-duc-3.jpg",
+    "images/giao-duc-4.jpg",
+    "images/giao-duc-5.jpg",
+    "images/giao-duc-6.jpg",
+    "images/giao-duc-7.jpg",
+    "images/giao-duc-8.jpg",
+    "images/giao-duc-9.jpg",
+    "images/giao-duc-10.jpg"
+  ],
+  "cat:the-thao": [
+    "images/the-thao-1.jpg",
+    "images/the-thao-2.jpg",
+    "images/the-thao-3.jpg",
+    "images/the-thao-4.jpg",
+    "images/the-thao-5.jpg",
+    "images/the-thao-6.jpg",
+    "images/the-thao-7.jpg",
+    "images/the-thao-8.jpg",
+    "images/the-thao-9.jpg",
+    "images/the-thao-10.jpg"
+  ],
+  "cat:cong-nghe": [
+    "images/cong-nghe-1.jpg",
+    "images/cong-nghe-2.jpg",
+    "images/cong-nghe-3.jpg",
+    "images/cong-nghe-4.jpg",
+    "images/cong-nghe-5.jpg",
+    "images/cong-nghe-6.jpg",
+    "images/cong-nghe-7.jpg",
+    "images/cong-nghe-8.jpg",
+    "images/cong-nghe-9.jpg",
+    "images/cong-nghe-10.jpg"
+  ],
+  "cat:suc-khoe": [
+    "images/suc-khoe-1.jpg",
+    "images/suc-khoe-2.jpg",
+    "images/suc-khoe-3.jpg",
+    "images/suc-khoe-4.jpg",
+    "images/suc-khoe-5.jpg",
+    "images/suc-khoe-6.jpg",
+    "images/suc-khoe-7.jpg",
+    "images/suc-khoe-8.jpg",
+    "images/suc-khoe-9.jpg",
+    "images/suc-khoe-10.jpg"
+  ]
+}

@@ -97,8 +97,7 @@
       .footer-grid { grid-template-columns: 1fr; }
     }
   </style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="theme.css?v=4">
+<link rel="stylesheet" href="theme.css?v=5">
 </head>
 <body>
   <header class="site-header">
@@ -140,7 +139,7 @@
     <div class="copyright">© <span id="year"></span> Tin tức 24h. Sản phẩm học tập, nội dung mang tính minh họa.</div>
   </footer>
 
-  <script src="data.js?v=4"></script>
+  <script src="data.js?v=5"></script>
   <script>
     "use strict";
 
@@ -256,6 +255,7 @@
           <div class="byline"><span>Tác giả: <strong>${esc(post.author)}</strong></span><span>${formatDate(post.publishedAt)}</span></div>
           <p class="sapo">${esc(post.excerpt)}</p>
           <div class="hero"><img referrerpolicy="no-referrer" data-id="${esc(post.id)}" src="${thumb(post)}" alt="${esc(post.title)}"></div>
+          <p class="hero-cap">Ảnh minh họa: ${esc(post.title)}</p>
           <div class="body">${paragraphs}</div>
         </article>
         <aside class="side"><h2>Bài viết liên quan</h2>${relHTML}</aside></div>`;

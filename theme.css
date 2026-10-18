@@ -1,36 +1,14 @@
-/* theme.css – lớp giao diện mới, nạp SAU style cũ trong mỗi trang */
-:root{--green:#0a5c3a;--green-dark:#063d27;--gold:#f2b705;--red:#c8281e;--paper:#eef1ef;--line:#dde3df}
-body{background:var(--paper);font-family:"Be Vietnam Pro","Segoe UI",Roboto,Arial,sans-serif}
-h1,h2,h3,.logo,.page-title,.list-title,.site-footer h4,.side h2{font-family:"Be Vietnam Pro","Segoe UI",Roboto,Arial,sans-serif!important;letter-spacing:-.01em}
-/* Header xanh đậm, chữ trắng */
-.site-header{background:var(--green);border-bottom:4px solid var(--gold);box-shadow:0 2px 8px rgba(0,0,0,.18)}
-.logo{color:#fff;text-transform:uppercase;letter-spacing:.08em!important;font-weight:800;border-left:6px solid var(--gold);padding-left:10px}
-.nav-item>a{color:#fff;text-transform:uppercase;font-size:.84rem;font-weight:700}
-.nav-item>a:hover,.nav-item>a.active{color:#fff;background:rgba(255,255,255,.14);box-shadow:inset 0 -4px 0 var(--gold)}
-.sub-menu{border-top:3px solid var(--gold)}
-.sub-menu a{color:var(--ink);text-transform:none;font-size:.92rem}
-.nav-toggle{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
-/* Tiêu đề trang & mục */
-.page-title{font-weight:800;color:var(--green);border-bottom:3px solid var(--green);padding-bottom:8px;display:block}
-.list-title{border-left:0;padding:0 0 6px;border-bottom:3px solid var(--green);color:var(--green);font-weight:800}
-.cat-tag{display:inline-block;background:var(--red);color:#fff;padding:2px 9px;border-radius:3px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
-/* Thẻ bài viết: nền trắng, bo góc, đổ bóng */
-.top-section{background:#fff;padding:22px;border:0;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
-.list-item{background:#fff;padding:16px;margin-top:14px;border:0;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:box-shadow .2s}
-.list-item:hover{box-shadow:0 6px 18px rgba(0,0,0,.12)}
-.ratio{border-radius:8px}
-.featured h2{font-weight:800;font-size:1.9rem}
-.small-post h3,.list-item h3{font-weight:700}
-.featured h2 a:hover,.small-post h3 a:hover,.list-item h3 a:hover,.rel a:hover h3{color:var(--red)}
-.load-more{background:var(--green);border-radius:30px;padding:12px 36px}
-/* Trang chi tiết */
-.layout>.article,.layout>.side{background:#fff;border-radius:12px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,.07);align-self:start}
-.article h1{font-weight:800;font-size:2.1rem}
-.sapo{border-left:5px solid var(--gold);padding-left:14px;color:#26332c}
-.body h2{font-size:1.3rem;font-weight:800;color:var(--green);margin:1.6em 0 .6em;padding-bottom:6px;border-bottom:2px solid var(--line)}
-.body p{font-size:1.1rem;color:#222b26}
-.side h2{border-left:0;border-bottom:3px solid var(--green);color:var(--green);padding:0 0 8px;font-weight:800}
-.rel .ratio{border-radius:6px}
-.site-footer{background:#08241a;border-top:4px solid var(--gold)}
-.site-footer h4{color:var(--gold)}
-@media(max-width:900px){.nav-item>a{border-top:1px solid rgba(255,255,255,.2)}.sub-menu a{color:#d7ecdf}.layout>.article,.layout>.side{padding:18px}}
+/* theme.css – CHỈ làm đẹp phần thân bài ở detail.html; trang chủ, menu, font tiêu đề giữ như ban đầu */
+.layout>.article,.layout>.side{background:#fff;border-radius:10px;padding:30px 34px;box-shadow:0 1px 8px rgba(0,0,0,.07);align-self:start}
+.layout>.side{padding:24px}
+.article h1{font-size:2.15rem}
+.byline{align-items:center}
+.sapo{border-left:4px solid var(--green);padding-left:16px;color:#26332c;font-weight:600}
+.hero{margin:0 0 6px;border-radius:6px}
+.hero-cap{font-size:.88rem;font-style:italic;color:var(--muted);text-align:center;margin:0 0 24px}
+.body{max-width:720px;margin:0 auto}
+.body p{font-size:1.1rem;line-height:1.85;text-align:justify;margin:0 0 1.25em;color:#222b26}
+.body p:first-child::first-letter{font-size:3.2rem;font-weight:700;float:left;line-height:.9;margin:6px 8px 0 0;color:var(--green);font-family:Georgia,serif}
+.side h2{margin-bottom:8px}
+.rel:last-child{border-bottom:0}
+@media(max-width:900px){.layout>.article,.layout>.side{padding:18px}.body p{text-align:left}}

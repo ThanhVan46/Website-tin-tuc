@@ -14,7 +14,7 @@
   "use strict";
 
   const STORAGE_KEY = "dantri_data";
-  const DATA_VERSION = 4;            // tăng số này khi đổi cấu trúc/dữ liệu mẫu → tự nạp lại
+  const DATA_VERSION = 5;            // tăng số này khi đổi cấu trúc/dữ liệu mẫu → tự nạp lại
   const SOURCE = "Tin tức 24h";
 
   /* ---------- 1. MENU PHÂN CẤP ---------- */
@@ -368,7 +368,11 @@
     (h, m) => `Một số ý kiến cho rằng vấn đề nêu trong “${h}” cần được nhìn nhận ở nhiều góc độ, cân nhắc cả lợi ích trước mắt lẫn tác động lâu dài đối với cộng đồng.`,
     (h, m) => `Bạn đọc quan tâm đến lĩnh vực ${m} có thể tiếp tục theo dõi chuyên mục để cập nhật những diễn biến mới cùng các phân tích chuyên sâu trong thời gian tới.`,
     (h, m) => `Các ý kiến tại buổi trao đổi đều thống nhất rằng sự phối hợp giữa các bên liên quan là yếu tố then chốt để những giải pháp đề ra đi vào thực tiễn.`,
-    (h, m) => `Để hiểu rõ hơn, cần xem xét bối cảnh chung của lĩnh vực ${m} trong thời gian qua, từ đó đánh giá đúng mức độ quan trọng của vấn đề.`
+    (h, m) => `Để hiểu rõ hơn, cần xem xét bối cảnh chung của lĩnh vực ${m} trong thời gian qua, từ đó đánh giá đúng mức độ quan trọng của vấn đề.`,
+    (h, m) => `“Điều quan trọng nhất là kết quả cuối cùng phải đến được với người dân”, một cán bộ phụ trách lĩnh vực ${m} chia sẻ khi trao đổi về nội dung “${h}”. Theo người này, mọi bước triển khai đều cần được kiểm chứng bằng phản hồi thực tế.`,
+    (h, m) => `Nhìn lại những tháng gần đây, các diễn biến trong lĩnh vực ${m} cho thấy xu hướng điều chỉnh khá rõ nét. Nhiều vấn đề trước kia chỉ được bàn ở cấp chuyên môn nay đã trở thành mối quan tâm chung của xã hội.`,
+    (h, m) => `Ở góc độ người trong cuộc, không ít người cho biết họ đã cảm nhận được sự thay đổi, dù mức độ còn khác nhau giữa từng địa bàn. Chính sự chênh lệch này đặt ra yêu cầu phải có thêm số liệu theo dõi đáng tin cậy.`,
+    (h, m) => `Từ những thông tin trên có thể thấy, câu chuyện “${h}” không phải sự việc đơn lẻ mà gắn với nhiều yếu tố khác nhau. Việc đánh giá đầy đủ cần thời gian, dữ liệu và sự tham gia của các bên liên quan.`
   ];
   const SUBS = [["Ý kiến từ thực tế", "Góc nhìn của chuyên gia", "Hướng đi sắp tới"], ["Bối cảnh vấn đề", "Những điều cần lưu ý", "Bước tiếp theo"], ["Diễn biến đáng chú ý", "Đánh giá từ giới chuyên môn", "Kỳ vọng thời gian tới"]];
 
@@ -382,10 +386,9 @@
       slug: slugify(head),
       excerpt: rot[0],                                                  // sapo: đoạn riêng của mục, không lặp tiêu đề
       content: (() => {
-        const m = node.title.toLowerCase(), sb = SUBS[i % SUBS.length], e = n => EXTRA[(i + n) % EXTRA.length](head, m);
-        const o = c.paras.filter(x => x !== rot[0]);
-        return [OPENERS[i % OPENERS.length](head), o[0], e(0), "## " + sb[0], o[1], e(2),
-          "## " + sb[1], o[2], e(4), "## " + sb[2], o[3], e(1), ...CLOSERS].join("\n");
+        const m = node.title.toLowerCase(), e = n => EXTRA[(i + n * 3) % EXTRA.length](head, m);
+        const o = c.paras.filter(x => x !== rot[0]);   // đoạn liền mạch, không chia tiêu đề phụ
+        return [OPENERS[i % OPENERS.length](head), o[0], e(0), o[1], e(1), e(2), o[2], e(3), e(4), o[3], e(5), ...CLOSERS].join("\n");
       })(),
       author: AUTHORS[(i + k) % AUTHORS.length],
       category: parent ? [parent.title, node.title] : [node.title],

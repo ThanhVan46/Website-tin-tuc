@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crawler Dân trí</title>
+  <style>
+    :root {
+      --paper: #f7f8f5; --ink: #1c2420; --muted: #5c6862; --line: #d5dbd6;
+      --green: #0d6b3f; --green-dark: #08502d; --ok-bg: #e3f3ea; --warn-bg: #fff4d6;
+      --warn: #7a5600; --err-bg: #fde6e4; --err: #9b1c13; --panel: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --paper: #121815; --ink: #e8eee9; --muted: #9aa8a0; --line: #2f3b34;
+        --green: #4cc38a; --green-dark: #7ad9ae; --ok-bg: #153325; --warn-bg: #3a2f10;
+        --warn: #f0cf75; --err-bg: #3d1a17; --err: #ff9d94; --panel: #1a221e; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink);
+      font: 16px/1.6 "Segoe UI", system-ui, -apple-system, Arial, sans-serif; }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+    h1 { font: 700 2rem/1.2 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
+    .lead { color: var(--muted); margin: 0 0 28px; max-width: 62ch; }
+    form { background: var(--panel); border: 1px solid var(--line); border-left: 5px solid var(--green);
+      border-radius: 6px; padding: 22px; display: grid; gap: 18px; }
+    label { font-weight: 600; display: block; margin-bottom: 6px; }
+    .hint { font-weight: 400; color: var(--muted); font-size: .9rem; }
+    input, textarea { width: 100%; padding: 10px 12px; font: inherit; color: var(--ink);
+      background: var(--paper); border: 1px solid var(--line); border-radius: 4px; }
+    textarea { min-height: 220px; resize: vertical; font: 13px/1.5 Consolas, "Courier New", monospace; }
+    input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    button { font: inherit; font-weight: 600; padding: 10px 20px; border-radius: 4px; cursor: pointer;
+      border: 1px solid var(--green); background: var(--green); color: #fff; }
+    button:hover { background: var(--green-dark); }
+    button.ghost { background: transparent; color: var(--green); }
+    button.ghost:hover { background: var(--ok-bg); }
+    #status { margin-top: 22px; padding: 14px 16px; border-radius: 4px; border: 1px solid transparent; }
+    #status[hidden] { display: none; }
+    #status.ok { background: var(--ok-bg); border-color: var(--green); }
+    #status.warn { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+    #status.err { background: var(--err-bg); border-color: var(--err); color: var(--err); }
+    h2 { font: 700 1.2rem Georgia, serif; margin: 28px 0 8px; }
+    pre { margin: 0; padding: 16px; background: #14201a; color: #d8f0e2; border-radius: 6px;
+      overflow: auto; max-height: 460px; font: 13px/1.5 Consolas, "Courier New", monospace; white-space: pre-wrap; word-break: break-word; }
+    .empty { color: var(--muted); font-style: italic; }
+    @media (prefers-reduced-motion: no-preference) { button { transition: background .15s; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Crawler bài viết Dân trí</h1>
+    <p class="lead">Trình duyệt chặn tải trực tiếp trang báo (CORS). Hãy mở bài viết trên dantri.com.vn, nhấn Ctrl+U để xem mã nguồn, sao chép toàn bộ và dán vào ô bên dưới.</p>
+
+    <form id="crawlForm" novalidate>
+      <div>
+        <label for="urlInput">URL bài viết gốc</label>
+        <input id="urlInput" type="url" placeholder="https://dantri.com.vn/xa-hoi/ten-bai-viet-20260928122246655.htm" required>
+      </div>
+      <div>
+        <label for="htmlInput">Mã nguồn HTML <span class="hint">(View Source của bài viết)</span></label>
+        <textarea id="htmlInput" placeholder="Dán mã HTML thô vào đây..." required></textarea>
+      </div>
+      <div class="actions">
+        <button type="submit">Tiến hành Crawler</button>
+        <button type="button" class="ghost" id="clearBtn">Xóa form</button>
+        <button type="button" class="ghost" id="copyBtn">Sao chép JSON</button>
+      </div>
+    </form>
+
+    <div id="status" role="status" aria-live="polite" hidden></div>
+
+    <h2>Kết quả JSON</h2>
+    <pre id="output"><span class="empty">Chưa có kết quả. Dán HTML và bấm “Tiến hành Crawler”.</span></pre>
+  </main>
+
+  <script src="data.js"></script>
+  <script>
+    "use strict";
+
+    /* ================== HÀM CRAWLER ================== */
+
+    /** Lấy text sạch của phần tử đầu tiên khớp một trong các selector (theo thứ tự ưu tiên). */
+    function pickText(doc, selectors) {
+      for (const sel of selectors) {
+        const el = doc.querySelector(sel);
+        const text = el && el.textContent.replace(/\s+/g, " ").trim();
+        if (text) return text;
+      }
+      return "";
+    }
+
+    function pickMeta(doc, name) {
+      const el = doc.querySelector(`meta[property="${name}"], meta[name="${name}"]`);
+      return el ? (el.getAttribute("content") || "").trim() : "";
+    }
+
+    /** Chuẩn hóa mọi dạng ngày giờ về "YYYY-MM-DD HH:mm". Trả "" nếu không đọc được. */
+    function normalizeDate(raw) {
+      if (!raw) return "";
+      const p2 = n => String(n).padStart(2, "0");
+      let m = raw.match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})/);          // ISO
+      if (m) return `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]}`;
+      m = raw.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\D+(\d{1,2}):(\d{2})/);         // dd/mm/yyyy - HH:mm
+      if (m) return `${m[3]}-${p2(m[2])}-${p2(m[1])} ${p2(m[4])}:${m[5]}`;
+      return "";
+    }
+
+    /** Tạo id: ưu tiên dãy số cuối URL Dân trí (…-20260928122246655.htm). */
+    function buildId(url, publishedAt) {
+      const m = url.match(/(\d{14,17})(?=\.htm)/);
+      if (m) return `dtri-${m[1]}`;
+      const digits = publishedAt.replace(/\D/g, "");
+      return `dtri-${digits}${String(Date.now()).slice(-5)}`;
+    }
+
+    /**
+     * Trích xuất bài viết từ HTML thô của dantri.com.vn.
+     * @param {string} url  URL bài viết gốc
+     * @param {string} htmlString  Mã nguồn HTML
+     * @returns {object} post đúng cấu trúc đặc tả
+     * @throws {Error} nếu thiếu dữ liệu bắt buộc
+     */
+    function crawlDanTri(url, htmlString) {
+      const doc = new DOMParser().parseFromString(htmlString, "text/html"); // không thực thi script
+
+      // 1. Tiêu đề
+      const title = pickText(doc, ["h1.title-page.detail", "h1.title-page", "h1.e-magazine__title", "article h1", "h1"])
+                    || pickMeta(doc, "og:title");
+      if (!title) throw new Error("Không tìm thấy tiêu đề (h1.title-page). Kiểm tra lại mã HTML đã dán.");
+
+      // 2. Sapo / tóm tắt
+      const excerpt = pickText(doc, ["h2.singular-sapo", ".singular-sapo", ".sapo", "h2.sapo"])
+                      || pickMeta(doc, "og:description") || pickMeta(doc, "description");
+
+      // 3. Nội dung: các thẻ <p> trong khối nội dung, bỏ chú thích ảnh và đoạn rỗng
+      const body = doc.querySelector(".singular-content, .detail-content, .e-magazine__body, article");
+      const paragraphs = body
+        ? [...body.querySelectorAll("p")]
+            .filter(p => !p.closest("figure, figcaption, .author-wrap, .related-news"))
+            .map(p => p.textContent.replace(/\s+/g, " ").trim())
+            .filter(Boolean)
+        : [];
+      if (!paragraphs.length) throw new Error("Không tìm thấy nội dung bài viết (.singular-content p).");
+
+      // 4. Tác giả
+      const author = pickText(doc, [".author-name b", ".author-name", ".author-wrap .name", ".author"])
+                     || pickMeta(doc, "author") || "Dân trí";
+
+      // 5. Chuyên mục từ breadcrumb (bỏ "Trang chủ")
+      let category = [...doc.querySelectorAll("ul.breadcrumb a, .dt-breadcrumb a, .breadcrumbs a, .breadcrumb a")]
+        .map(a => a.textContent.replace(/\s+/g, " ").trim())
+        .filter(t => t && !/^trang chủ$/i.test(t));
+      category = [...new Set(category)];
+      if (!category.length) {
+        const section = pickMeta(doc, "article:section");
+        category = [section || "Chưa phân loại"];
+      }
+
+      // 6. Ngày giờ đăng
+      const timeEl = doc.querySelector("time.author-time, time[datetime], .author-time");
+      const publishedAt = normalizeDate(timeEl && (timeEl.getAttribute("datetime") || timeEl.textContent))
+                          || normalizeDate(pickMeta(doc, "article:published_time"));
+      if (!publishedAt) throw new Error("Không đọc được thời gian đăng (time.author-time).");
+
+      return {
+        id: buildId(url, publishedAt),
+        title,
+        slug: DataStore.slugify(title),
+        excerpt,
+        content: paragraphs.join("\n"),
+        author,
+        category,
+        publishedAt,
+        source: DataStore.SOURCE,
+        url
+      };
+    }
+
+    /* ================== GIAO DIỆN ================== */
+    const $ = id => document.getElementById(id);
+    const form = $("crawlForm"), urlInput = $("urlInput"), htmlInput = $("htmlInput");
+    const statusBox = $("status"), output = $("output");
+
+    function showStatus(type, message) {
+      statusBox.className = type;
+      statusBox.textContent = message;
+      statusBox.hidden = false;
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const url = urlInput.value.trim();
+      const html = htmlInput.value.trim();
+
+      if (!/^https?:\/\/(www\.)?dantri\.com\.vn\//i.test(url)) {
+        return showStatus("err", "URL phải thuộc dantri.com.vn và bắt đầu bằng https://");
+      }
+      if (html.length < 200) {
+        return showStatus("err", "Ô mã nguồn HTML đang trống hoặc quá ngắn. Hãy dán toàn bộ nội dung View Source.");
+      }
+
+      try {
+        const post = crawlDanTri(url, html);
+        output.textContent = JSON.stringify(post, null, 2);
+
+        const result = DataStore.addPost(post);   // trùng id → không ghi đè
+        if (result.added) {
+          showStatus("ok", `Crawl thành công: “${post.title}” đã được lưu vào LocalStorage (id: ${post.id}).`);
+        } else {
+          showStatus("warn", `Bài viết có id ${post.id} đã tồn tại nên không được ghi đè. Dữ liệu cũ được giữ nguyên.`);
+        }
+      } catch (err) {
+        output.innerHTML = '<span class="empty">Chưa có kết quả.</span>';
+        showStatus("err", "Crawl thất bại: " + err.message);
+      }
+    });
+
+    $("clearBtn").addEventListener("click", () => {
+      form.reset();
+      statusBox.hidden = true;
+      output.innerHTML = '<span class="empty">Chưa có kết quả. Dán HTML và bấm “Tiến hành Crawler”.</span>';
+    });
+
+    $("copyBtn").addEventListener("click", async () => {
+      const text = output.textContent;
+      if (!text.trim().startsWith("{")) return showStatus("warn", "Chưa có JSON để sao chép.");
+      try { await navigator.clipboard.writeText(text); showStatus("ok", "Đã sao chép JSON vào clipboard."); }
+      catch { showStatus("warn", "Trình duyệt không cho phép sao chép tự động. Hãy bôi đen và sao chép thủ công."); }
+    });
+  </script>
+</body>
+</html>
